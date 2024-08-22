@@ -5,8 +5,7 @@ from time import sleep
 from typing import List, Tuple
 from keyboard import read_event, KEY_DOWN
 
-RED = "\033[91m"
-DUNNO = "\033[92m"
+colors = ["\033[95m" "\033[94m" "\033[96m" "\033[92m" "\033[93m" "\033[91m" "\033[1m"]
 RESET = "\033[0m"
 
 patterns = {
@@ -113,28 +112,40 @@ if __name__ == "__main__":
     height = 12
     arena = [[0 for _ in range(width)] for _ in range(height)]
     arena.append([1 for _ in range(width)])
-    block = Entity(patterns["T"], RED)
+    block = Entity(patterns["T"], choice(colors))
 
     while True:
         display(arena, block)
         print(block.coordinates)
         sleep(0.25)
-        key = get_key()
-        match key:
+        match get_key():
             case "left":
-                block.coordinates[0] -= 1
+                if block.coordinates[0] > 0:
+                    block.coordinates[0] -= 1
             case "right":
-                block.coordinates[0] += 1
+                if block.coordinates[0] + block.width() < width:
+                    block.coordinates[0] += 1
             case "space":
                 block.coordinates[1] = height - 1
                 display(arena, block)
             case "r":
                 block.rotate()
+            case "q":
+                print("GAME OVER")
+                break
 
         block.coordinates[1] += 1
         if block.colides(arena) or block.coordinates[1] == height:
             block.coordinates[1] -= 1
             solidify(arena, block)
-            block = Entity(choice(list(patterns.values())), DUNNO, [0, 0])
+            block = Entity(choice(list(patterns.values())), choice(colors), [0, 0])
 
         system("cls")
+
+
+# TODO: ganhar o jogo (depois de 99999999 pontos)
+# TODO: excluir linhas
+# TODO: acumular pontos
+# TODO: preview dos próximos blocos
+# TODO: sortear cor para os blocos
+# TODO: perder o jogo
